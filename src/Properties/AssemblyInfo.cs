@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("skwas")]
 [assembly: AssemblyProduct("skwas.IO")]
-[assembly: AssemblyCopyright("© 2007-2009 skwas")]
+[assembly: AssemblyCopyright("© 2007-2015 skwas")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.4.*")]
+[assembly: AssemblyVersion("4.0.*")]
