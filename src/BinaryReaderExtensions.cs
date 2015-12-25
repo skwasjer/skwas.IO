@@ -134,6 +134,7 @@ namespace skwas.IO
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingCharacters">The terminating characters.</param>
 		/// <returns>The string.</returns>
+		/// <remarks>Note that the behavior is different from ReadString which takes a string for a terminator.</remarks>
 		public static string ReadString(this BinaryReader reader, char[] terminatingCharacters)
 		{
 			var tc = (IList<char>)terminatingCharacters;
@@ -164,6 +165,7 @@ namespace skwas.IO
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingString">The terminating string.</param>
 		/// <returns>The string.</returns>
+		/// <remarks>Note that the behavior is different from ReadString which takes a character array for a terminator.</remarks>
 		public static string ReadString(this BinaryReader reader, string terminatingString)
 		{
 			if (terminatingString == null) throw new ArgumentNullException(nameof(terminatingString));
