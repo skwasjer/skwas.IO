@@ -12,8 +12,10 @@ namespace skwas.IO_Tests
 	[TestClass]
 	public class BinaryReaderExtensionTests
 	{
-		public const string Utf8String = "Şớოε şặмрĺê ÄŚĈÍ|-ť℮χŧ";
-		public static readonly char[] NullTerminator = {'\0'};
+		const string Utf8String = "Şớოε şặмрĺê ÄŚĈÍ|-ť℮χŧ";
+		static readonly char[] NullTerminator = { '\0' };
+		static readonly char[] CrLfTerminators = { '\r', '\n' };
+		static readonly string CrLfTerminator = "\r\n";
 
 		[TestMethod]
 		public void it_will_read_color()
@@ -245,6 +247,48 @@ namespace skwas.IO_Tests
 				reader.ReadString(NullTerminator).Should().BeEmpty();
 				reader.ReadString(NullTerminator).Should().Be(Utf8String);
 				reader.ReadString(NullTerminator).Should().Be("Last");
+				reader.BaseStream.ShouldBeEof();
+			}
+		}
+
+		[TestMethod]
+		public void it_will_read_strings_terminated_by_any_character()
+		{
+			using (var reader = new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(string.Format("First\r\n\r\n{0}\r\nLast\r\n", Utf8String)))))
+			{
+				reader.ReadString(CrLfTerminators).Should().Be("First");
+				reader.ReadString(CrLfTerminators).Should().BeEmpty();
+				reader.ReadString(CrLfTerminators).Should().BeEmpty();
+				reader.ReadString(CrLfTerminators).Should().BeEmpty();
+				reader.ReadString(CrLfTerminators).Should().Be(Utf8String);
+				reader.ReadString(CrLfTerminators).Should().BeEmpty();
+				reader.ReadString(CrLfTerminators).Should().Be("Last");
+				reader.ReadString(CrLfTerminators).Should().BeEmpty();
+				reader.BaseStream.ShouldBeEof();
+			}
+		}
+
+		[TestMethod]
+		public void it_will_read_strings_terminated_by_string()
+		{
+			using (var reader = new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(string.Format("Fir\rst\r\n\r\n{0}\r\nL\rast\r\n", Utf8String)))))
+			{
+				var result = reader.ReadString(CrLfTerminator).Should().Be("Fir\rst").And.Subject;
+				reader.ReadString(CrLfTerminator).Should().BeEmpty();
+				reader.ReadString(CrLfTerminator).Should().Be(Utf8String);
+				reader.ReadString(CrLfTerminator).Should().Be("L\rast");
+				reader.BaseStream.ShouldBeEof();
+			}
+
+			const string terminator = "123456789";
+
+			using (var reader = new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(string.Format("abc1234def{0}ghi{0}{0}jklmno1234{0}123pqrs{0}", terminator)))))
+			{
+				reader.ReadString(terminator).Should().Be("abc1234def");
+				reader.ReadString(terminator).Should().Be("ghi");
+				reader.ReadString(terminator).Should().BeEmpty();
+				reader.ReadString(terminator).Should().Be("jklmno1234");
+				reader.ReadString(terminator).Should().Be("123pqrs");
 				reader.BaseStream.ShouldBeEof();
 			}
 		}

@@ -136,7 +136,7 @@ namespace skwas.IO
 		/// <returns>The string.</returns>
 		public static string ReadString(this BinaryReader reader, char[] terminatingCharacters)
 		{
-			var tc = (IList<char>)(terminatingCharacters);
+			var tc = (IList<char>)terminatingCharacters;
 			var buffer = new StringBuilder();
 			while (true)
 			{
@@ -156,6 +156,44 @@ namespace skwas.IO
 		public static string ReadString(this BinaryReader reader, char terminatingCharacter)
 		{
 			return ReadString(reader, new[] {terminatingCharacter});
+		}
+
+		/// <summary>
+		/// Reads a string from the current stream. The stream is read until the terminating string is found. The terminating string is not included in the returned string.
+		/// </summary>
+		/// <param name="reader">The binary reader.</param>
+		/// <param name="terminatingString">The terminating string.</param>
+		/// <returns>The string.</returns>
+		public static string ReadString(this BinaryReader reader, string terminatingString)
+		{
+			if (terminatingString == null) throw new ArgumentNullException(nameof(terminatingString));
+			if (terminatingString == string.Empty) throw new ArgumentException("Specify the terminating string.", nameof(terminatingString));
+
+			var tc = terminatingString.ToCharArray();
+			var pos = 0;
+			var buffer = new StringBuilder();
+			var c = reader.ReadChar();
+			while (true)
+			{
+				while (tc[pos] == c)
+				{
+					if (++pos == tc.Length) return buffer.ToString();
+					// Read next.
+					c = reader.ReadChar();
+				}
+
+				if (pos > 0)
+				{
+					buffer.Append(terminatingString.Substring(0, pos));
+					pos = 0;
+				}
+				else
+				{
+					buffer.Append(c);
+					// Read next.
+					c = reader.ReadChar();
+				}
+			}
 		}
 	}	
 }
