@@ -4,7 +4,7 @@ using ComTypes = System.Runtime.InteropServices.ComTypes;
 
 namespace skwas.IO
 {
-	internal abstract partial class NativeMethods
+	static partial class NativeMethods
 	{
 		[Flags]
 		public enum Stgm
