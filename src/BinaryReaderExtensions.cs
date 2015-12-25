@@ -129,7 +129,7 @@ namespace skwas.IO
 		}
 
 		/// <summary>
-		/// Reads a string from the current stream. The stream is read until the specified characters are found in order. The terminating characters are not included in the returned string.
+		/// Reads a string from the current stream. The stream is read until one of the characters is found. The terminating character is not included in the returned string.
 		/// </summary>
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingCharacters">The terminating characters.</param>
