@@ -5,9 +5,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using skwas.IO;
 
-namespace skwas.IO_Tests
+namespace skwas.IO.Tests
 {
 	[TestClass]
 	public class BinaryReaderExtensionTests

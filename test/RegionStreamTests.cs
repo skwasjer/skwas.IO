@@ -2,9 +2,8 @@
 using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using skwas.IO;
 
-namespace skwas.IO_Tests
+namespace skwas.IO.Tests
 {
 	[TestClass]
 	public class RegionStreamTests

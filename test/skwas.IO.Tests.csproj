@@ -6,8 +6,8 @@
     <ProjectGuid>{7620C0BC-0D1C-4590-B65D-86A850CE3DEA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>skwas.IO_Tests</RootNamespace>
-    <AssemblyName>skwas.IO Tests</AssemblyName>
+    <RootNamespace>skwas.IO.Tests</RootNamespace>
+    <AssemblyName>skwas.IO.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

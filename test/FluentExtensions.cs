@@ -2,7 +2,7 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 
-namespace skwas.IO_Tests
+namespace skwas.IO.Tests
 {
 	static class FluentExtensions
 	{

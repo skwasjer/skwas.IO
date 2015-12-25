@@ -2,14 +2,12 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using ComTypes = System.Runtime.InteropServices.ComTypes;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using skwas.IO;
+using ComTypes = System.Runtime.InteropServices.ComTypes;
 
-namespace skwas.IO_Tests
+namespace skwas.IO.Tests
 {
 	[TestClass]
 	public class UnmanagedStreamTests
