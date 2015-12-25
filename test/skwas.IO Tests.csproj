@@ -67,7 +67,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="BinaryReaderExTests.cs" />
+    <Compile Include="BinaryReaderExtensionTests.cs" />
     <Compile Include="FluentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnmanagedStreamTests.cs" />

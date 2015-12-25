@@ -8,63 +8,41 @@ using System.Runtime.InteropServices;
 namespace skwas.IO
 {
 	/// <summary>
-	/// Inherited from <see cref="BinaryReader"/>, extended with a functionality to read structures/objects and strings.
+	/// Extensions for <see cref="BinaryReader"/>.
 	/// </summary>
-	public class BinaryReaderEx : BinaryReader
+	public static class BinaryReaderExtensions
 	{
 		private static readonly Type ColorType = typeof(Color);
-
-		/// <summary>
-		/// Initializes a new instance the <see cref="BinaryReaderEx"/> based on the supplied stream and using <see cref="UTF8Encoding"/>.
-		/// </summary>
-		/// <param name="input">The supplied stream.</param>
-		public BinaryReaderEx(Stream input)
-			: base(input)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="BinaryReaderEx"/> based on the supplied stream and a specific character encoding.
-		/// </summary>
-		/// <param name="input">The supplied stream.</param>
-		/// <param name="encoding">The character encoding.</param>
-		public BinaryReaderEx(Stream input, Encoding encoding)
-			: base(input, encoding)
-		{
-		}
-
-		~BinaryReaderEx()
-		{
-			Dispose(false);
-		}
 
 		/// <summary>
 		/// Reads a structure/class of <typeparamref name="T"/> from the current stream and advances the current position of the stream by the size of the structure in bytes.
 		/// </summary>
 		/// <typeparam name="T">The type to read.</typeparam>
+		/// <param name="reader">The binary reader.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
-		public T ReadStruct<T>()
+		public static T ReadStruct<T>(this BinaryReader reader)
 		{
-			return (T)ReadStruct(typeof (T));
+			return (T)ReadStruct(reader, typeof (T));
 		}
 
 		/// <summary>
 		/// Reads a structure/class of <paramref name="type"/> from the current stream and advances the current position of the stream by the size of the structure in bytes.
 		/// </summary>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="type">The type to read.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
-		public object ReadStruct(Type type)
+		public static object ReadStruct(this BinaryReader reader, Type type)
 		{
 			// Take care of nullable types. Although we can't read null values from a stream, the caller expects the underlying type.
 			var targetType = Nullable.GetUnderlyingType(type) ?? type;
 
 			// Bools are deserialized as byte 0 = false, otherwise = true.
 			if (targetType == typeof(bool))
-				return ReadByte() > 0;
+				return reader.ReadByte() > 0;
 
 			if (targetType == ColorType)
 				// The color struct cannot be deserialized using interop.
-				return Color.FromArgb(ReadByte(), ReadByte(), ReadByte(), ReadByte());
+				return Color.FromArgb(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
 
 			// If the type is enum, we have to deserialize using underlying type.
 			Type enumType = null;
@@ -76,7 +54,7 @@ namespace skwas.IO
 
 			// Determine size of requested structure and read the struct.
 			var structSize = Marshal.SizeOf(targetType);
-			var value = ReadStruct(targetType, structSize);
+			var value = ReadStruct(reader, targetType, structSize);
 
 			// If enum, cast back to the enum type.
 			if (enumType != null)
@@ -89,24 +67,26 @@ namespace skwas.IO
 		/// Reads a structure/class of <typeparamref name="T"/> from the current stream and advances the current position of the stream by the size of the structure in bytes.
 		/// </summary>
 		/// <typeparam name="T">The type to read.</typeparam>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="structSize">The size of the structure.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
-		public object ReadStruct<T>(int structSize)
+		public static object ReadStruct<T>(this BinaryReader reader, int structSize)
 		{
-			return ReadStruct(typeof(T), structSize);
+			return ReadStruct(reader, typeof(T), structSize);
 		}
 
 		/// <summary>
 		/// Reads a structure/class of specified <paramref name="type"/> from the current stream and advances the current position of the stream by the size of the structure in bytes.
 		/// </summary>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="type">The type to read.</param>
 		/// <param name="structSize">The size of the structure.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
 		/// <exception cref="EndOfStreamException">Thrown when the requested <paramref name="structSize"/> exceeds the remaining available data.</exception>
-		public object ReadStruct(Type type, int structSize)
+		public static object ReadStruct(this BinaryReader reader, Type type, int structSize)
 		{
 			// Read bytes from stream.
-			var structData = ReadBytes(structSize);
+			var structData = reader.ReadBytes(structSize);
 
 			// Check if data read matches requested.
 			if (structData.Length != structSize)
@@ -134,14 +114,15 @@ namespace skwas.IO
 		/// <summary>
 		/// Reads a string from the current stream, using specified number of characters.
 		/// </summary>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="characters">The number of characters to read.</param>
 		/// <returns>The string.</returns>
-		public string ReadString(int characters)
+		public static string ReadString(this BinaryReader reader, int characters)
 		{
 			var buffer = new StringBuilder();
 			for (var i = 0; i < characters; i++)
 			{
-				var c = ReadChar();
+				var c = reader.ReadChar();
 				buffer.Append(c);
 			}
 			return buffer.ToString();
@@ -150,15 +131,16 @@ namespace skwas.IO
 		/// <summary>
 		/// Reads a string from the current stream. The stream is read until the specified characters are found in order. The terminating characters are not included in the returned string.
 		/// </summary>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingCharacters">The terminating characters.</param>
 		/// <returns>The string.</returns>
-		public string ReadString(char[] terminatingCharacters)
+		public static string ReadString(this BinaryReader reader, char[] terminatingCharacters)
 		{
 			var tc = (IList<char>)(terminatingCharacters);
 			var buffer = new StringBuilder();
 			while (true)
 			{
-				var c = ReadChar();
+				var c = reader.ReadChar();
 				if (tc.Contains(c)) break;
 				buffer.Append(c);
 			}
@@ -168,11 +150,12 @@ namespace skwas.IO
 		/// <summary>
 		/// Reads a string from the current stream. The stream is read until the specified character is found. The terminating character is not included in the returned string.
 		/// </summary>
+		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingCharacter">The terminating character.</param>
 		/// <returns>The string.</returns>
-		public string ReadString(char terminatingCharacter)
+		public static string ReadString(this BinaryReader reader, char terminatingCharacter)
 		{
-			return ReadString(new[] {terminatingCharacter});
+			return ReadString(reader, new[] {terminatingCharacter});
 		}
 	}	
 }
