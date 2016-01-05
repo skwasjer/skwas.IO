@@ -82,7 +82,6 @@
     <Compile Include="ChunkedFiles\IChunkFile.cs" />
     <Compile Include="ChunkedFiles\IChunkResolver.cs" />
     <Compile Include="IRawSerializable.cs" />
-    <Compile Include="GenericList.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionStream.cs" />
