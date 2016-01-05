@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using ComTypes = System.Runtime.InteropServices.ComTypes;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security;
+using System.Security.Permissions;
 
 namespace skwas.IO
 {
@@ -11,6 +13,7 @@ namespace skwas.IO
 	/// Encapsulates an unmanaged IStream to provide access from managed code.
 	/// </summary>
 	/// <remarks>Other implementations are not as complete as my current implementation (as far as I have found), and do not support for instance, reading to or writing from an offset in a byte array, or assume each IStream is always both readable and writeable, or are required to be compiled using unsafe context (for using unchecked pointers).</remarks>
+	[SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
 	public sealed class UnmanagedStream : Stream
 	{
 		private bool _disposed;
@@ -30,6 +33,7 @@ namespace skwas.IO
 		/// </summary>
 		/// <param name="stream">The <see cref="IStream"/> to encapsulate.</param>
 		/// <param name="releaseOnDispose">When true, <see cref="Marshal.ReleaseComObject"/> will be called on the stream.</param>
+		[SecuritySafeCritical]
 		public UnmanagedStream(IStream stream, bool releaseOnDispose = true)
 		{
 			if (stream == null)
@@ -76,6 +80,7 @@ namespace skwas.IO
 		/// Releases the unmanaged resources used by <see cref="UnmanagedStream"/> and optionally releases the managed resources.
 		/// </summary>
 		/// <param name="disposing"></param>
+		[SecuritySafeCritical]
 		protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
@@ -85,6 +90,7 @@ namespace skwas.IO
 			if (disposing)
 			{
 				// Release managed.
+				Flush();
 			}
 
 			// Release unmanaged.			
@@ -119,6 +125,7 @@ namespace skwas.IO
 		/// <summary>
 		/// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
 		/// </summary>
+		[SecuritySafeCritical]
 		public override void Flush()
 		{
 			if (_disposed)
@@ -182,6 +189,7 @@ namespace skwas.IO
 		/// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
 		/// <param name="count">The maximum number of bytes to be read from the current stream.</param>
 		/// <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+		[SecuritySafeCritical]
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			if (_disposed)
@@ -231,6 +239,7 @@ namespace skwas.IO
 		/// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
 		/// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
 		/// <returns></returns>
+		[SecuritySafeCritical]
 		public override long Seek(long offset, SeekOrigin origin)
 		{
 			if (_disposed)
@@ -254,6 +263,7 @@ namespace skwas.IO
 		/// Sets the length of the current stream.
 		/// </summary>
 		/// <param name="value">The desired length of the current stream in bytes.</param>
+		[SecuritySafeCritical]
 		public override void SetLength(long value)
 		{
 			if (_disposed)
@@ -280,6 +290,7 @@ namespace skwas.IO
 		/// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
 		/// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
 		/// <param name="count">The number of bytes to be written to the current stream.</param>
+		[SecuritySafeCritical]
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (_disposed)

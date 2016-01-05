@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace skwas.IO
 {
@@ -11,6 +12,17 @@ namespace skwas.IO
 	public static class BinaryWriterExtensions
 	{
 		/// <summary>
+		/// Writes a string to the underlying stream. The string is terminated using a '\0' character.
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="value"></param>
+		[SecuritySafeCritical]
+		public static void WriteNullTerminatedString(this BinaryWriter writer, string value)
+		{
+			Write(writer, value, '\0');
+		}
+
+		/// <summary>
 		/// Writes a fixed length string to the underlying stream. If the string is shorter that <paramref name="fixedLength"/>, it is padded using <paramref name="padWith"/>
 		/// </summary>
 		/// <param name="writer">The writer.</param>
@@ -18,6 +30,7 @@ namespace skwas.IO
 		/// <param name="fixedLength">The fixed length of the string.</param>
 		/// <param name="padWith">The character to pad the string with.</param>
 		/// <exception cref="ArgumentException"></exception>
+		[SecuritySafeCritical]
 		public static void Write(this BinaryWriter writer, string value, int fixedLength, char padWith = '\0')
 		{
 			if (value == null)
@@ -34,6 +47,7 @@ namespace skwas.IO
 		/// <param name="writer">The writer.</param>
 		/// <param name="value">The string to write.</param>
 		/// <param name="lengthPrefixed">True to write as length prefixed string, false to write the string without length prefix.</param>
+		[SecuritySafeCritical]
 		public static void Write(this BinaryWriter writer, string value, bool lengthPrefixed)
 		{
 			if (value == null)
@@ -54,6 +68,7 @@ namespace skwas.IO
 		/// <param name="writer">The writer.</param>
 		/// <param name="value">The string to write.</param>
 		/// <param name="terminatingCharacter">The terminating character.</param>
+		[SecuritySafeCritical]
 		public static void Write(this BinaryWriter writer, string value, char terminatingCharacter)
 		{
 			if (value == null)
@@ -68,6 +83,7 @@ namespace skwas.IO
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="value">The structure the write to the stream.</param>
+		[SecuritySafeCritical]
 		public static void WriteStruct(this BinaryWriter writer, object value)
 		{
 			if (value == null)

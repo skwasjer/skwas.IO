@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace skwas.IO
 {
@@ -20,6 +21,7 @@ namespace skwas.IO
 		/// <typeparam name="T">The type to read.</typeparam>
 		/// <param name="reader">The binary reader.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
+		[SecuritySafeCritical]
 		public static T ReadStruct<T>(this BinaryReader reader)
 		{
 			return (T)ReadStruct(reader, typeof (T));
@@ -31,6 +33,7 @@ namespace skwas.IO
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="type">The type to read.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
+		[SecuritySafeCritical]
 		public static object ReadStruct(this BinaryReader reader, Type type)
 		{
 			// Take care of nullable types. Although we can't read null values from a stream, the caller expects the underlying type.
@@ -70,6 +73,7 @@ namespace skwas.IO
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="structSize">The size of the structure.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
+		[SecuritySafeCritical]
 		public static object ReadStruct<T>(this BinaryReader reader, int structSize)
 		{
 			return ReadStruct(reader, typeof(T), structSize);
@@ -83,6 +87,7 @@ namespace skwas.IO
 		/// <param name="structSize">The size of the structure.</param>
 		/// <returns>An object of specified type, read from the stream.</returns>
 		/// <exception cref="EndOfStreamException">Thrown when the requested <paramref name="structSize"/> exceeds the remaining available data.</exception>
+		[SecuritySafeCritical]
 		public static object ReadStruct(this BinaryReader reader, Type type, int structSize)
 		{
 			// Read bytes from stream.
@@ -117,6 +122,7 @@ namespace skwas.IO
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="characters">The number of characters to read.</param>
 		/// <returns>The string.</returns>
+		[SecuritySafeCritical]
 		public static string ReadString(this BinaryReader reader, int characters)
 		{
 			var buffer = new StringBuilder();
@@ -135,6 +141,7 @@ namespace skwas.IO
 		/// <param name="terminatingCharacters">The terminating characters.</param>
 		/// <returns>The string.</returns>
 		/// <remarks>Note that the behavior is different from ReadString which takes a string for a terminator.</remarks>
+		[SecuritySafeCritical]
 		public static string ReadString(this BinaryReader reader, char[] terminatingCharacters)
 		{
 			var tc = (IList<char>)terminatingCharacters;
@@ -149,11 +156,21 @@ namespace skwas.IO
 		}
 
 		/// <summary>
+		/// Reads a null terminated string from the current stream. The stream is read until the null character is found. The terminating character is not included in the returned string.
+		/// </summary>
+		[SecuritySafeCritical]
+		public static string ReadNullTerminatedString(this BinaryReader reader)
+		{
+			return ReadString(reader, new[] { '\0' });
+		}
+
+		/// <summary>
 		/// Reads a string from the current stream. The stream is read until the specified character is found. The terminating character is not included in the returned string.
 		/// </summary>
 		/// <param name="reader">The binary reader.</param>
 		/// <param name="terminatingCharacter">The terminating character.</param>
 		/// <returns>The string.</returns>
+		[SecuritySafeCritical]
 		public static string ReadString(this BinaryReader reader, char terminatingCharacter)
 		{
 			return ReadString(reader, new[] {terminatingCharacter});
@@ -166,6 +183,7 @@ namespace skwas.IO
 		/// <param name="terminatingString">The terminating string.</param>
 		/// <returns>The string.</returns>
 		/// <remarks>Note that the behavior is different from ReadString which takes a character array for a terminator.</remarks>
+		[SecuritySafeCritical]
 		public static string ReadString(this BinaryReader reader, string terminatingString)
 		{
 			if (terminatingString == null) throw new ArgumentNullException(nameof(terminatingString));
