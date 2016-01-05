@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Helper
+safeRunCommand() {
+    typeset cmd="$*"
+    typeset ret_code
+
+    echo cmd=$cmd
+    eval $cmd
+    ret_code=$?
+    if [ $ret_code != 0 ]; then
+        printf "Error : [%d] when executing command: '$cmd'" $ret_code
+        exit $ret_code
+    fi
+}
+
+# Path To MSBuild.exe
+MSBuild="C:/Program\ Files\ \(x86\)/MSBuild/14.0/Bin/MSBuild.exe"
+# Path To MSTest.exe
+# MSTest="/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 11.0/Common7/IDE/MSTest.exe"
+MSTest="n:/Dev/Visual\ Studio\ 14.0/Common7/IDE/MSTest.exe"
+# Get Project root path (without tailing /)
+ProjectRoot="$(git rev-parse --show-toplevel)"
+
+# Test Containers (without leading /)
+Tests=(
+    "test/bin/Debug/skwas.IO.Tests.dll"
+)
+
+
+# Build
+safeRunCommand $MSBuild $ProjectRoot/skwas.IO.sln
+
+# Test
+Args=("${Tests[@]/#//testcontainer:$ProjectRoot/}")
+safeRunCommand $MSTest $(eval 'echo "${Args[*]}"')
