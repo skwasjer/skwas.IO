@@ -91,10 +91,11 @@ namespace skwas.IO
 			{
 				// Release managed.
 				Flush();
+
+				if (_stream != null && Marshal.IsComObject(_stream) && _releaseOnDispose) Marshal.ReleaseComObject(_stream);
 			}
 
 			// Release unmanaged.			
-			if (_stream != null && Marshal.IsComObject(_stream) && _releaseOnDispose) Marshal.ReleaseComObject(_stream);
 			if (_hBytesRead != IntPtr.Zero) Marshal.FreeCoTaskMem(_hBytesRead);
 			if (_hPosition != IntPtr.Zero) Marshal.FreeCoTaskMem(_hPosition);
 
