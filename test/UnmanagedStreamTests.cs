@@ -49,7 +49,7 @@ namespace skwas.IO.Tests
 		[TestMethod]
 		public void it_will_open_empty_stream()
 		{
-			using (var ms = new UnmanagedStream(SHCreateMemStream()))
+			using (var ms = new UnmanagedStream(CreateStreamOnHGlobal()))
 			{
 				ms.CanRead.Should().BeTrue("because it should support reading");
 				ms.CanWrite.Should().BeTrue("because it should support writing");

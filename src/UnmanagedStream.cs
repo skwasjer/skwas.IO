@@ -331,20 +331,26 @@ namespace skwas.IO
 
 		#region Helpers
 
+		[SecuritySafeCritical]
 		private static NativeMethods.Stgm GetAccessMode(IStream stream)
 		{
-			// Get statistics from IStream.
-			ComTypes.STATSTG stat;
 			try
 			{
-				// PROBLEM: when IStream is created using CreateStreamOnHGlobal, the stat flags do not indicate ReadWrite mode (expected), instead Read is returned.
+				// If IStream is created via CreateStreamOnHGlobal, stream.Stat() does not return the proper read/write state of the stream.
+				// We bypass this by checking if it is created that way, and just return ReadWrite mode.
+				IntPtr hStream;
+				if (0 == NativeMethods.GetHGlobalFromStream(stream, out hStream) && hStream != IntPtr.Zero)
+					return NativeMethods.Stgm.ReadWrite;
+
+				// Get statistics from IStream.
+				ComTypes.STATSTG stat;
 				stream.Stat(out stat, (int)NativeMethods.STATFLAG.NoName);
+				return (NativeMethods.Stgm)stat.grfMode;
 			}
 			catch (Exception ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamNotInitialized, ex);
 			}
-			return (NativeMethods.Stgm)stat.grfMode;
 		}
 
 		#endregion

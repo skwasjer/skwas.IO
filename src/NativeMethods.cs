@@ -6,6 +6,9 @@ namespace skwas.IO
 {
 	static partial class NativeMethods
 	{
+		[DllImport("ole32")]
+		public static extern int GetHGlobalFromStream(ComTypes.IStream pstm, out IntPtr phglobal);
+
 		[Flags]
 		public enum Stgm
 		{
