@@ -161,7 +161,7 @@ namespace skwas.IO
 				}
 				catch (Exception ex)
 				{
-					throw new IOException(Resources.UnmanagedStream.IOException_StreamGetLength, ex);
+					throw new InvalidOperationException(Resources.UnmanagedStream.IOException_StreamGetLength, ex);
 				}
 			}
 		}
