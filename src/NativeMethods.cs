@@ -58,7 +58,12 @@ namespace skwas.IO
 			NoOpen
 		}
 
-		[
+		public enum STG_E
+		{
+			SeekError = unchecked((int)0x80030019)
+		}
+
+	[
 		ComImport,
 		Guid("0000000a-0000-0000-C000-000000000046"),
 		InterfaceType(ComInterfaceType.InterfaceIsIUnknown)

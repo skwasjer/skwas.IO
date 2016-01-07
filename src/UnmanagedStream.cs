@@ -51,7 +51,7 @@ namespace skwas.IO
 				stream.Seek(0, (int)SeekOrigin.Current, IntPtr.Zero);
 				CanSeek = true;
 			}
-			catch (Exception)
+			catch (COMException ex) when ((NativeMethods.STG_E)ex.HResult == NativeMethods.STG_E.SeekError)
 			{
 				// Ignore
 			}
@@ -136,7 +136,7 @@ namespace skwas.IO
 			{
 				_stream.Commit((int)NativeMethods.STGC.Default);
 			}
-			catch (Exception ex)
+			catch (COMException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamCantFlush, ex);
 			}
