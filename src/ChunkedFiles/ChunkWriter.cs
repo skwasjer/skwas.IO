@@ -36,7 +36,6 @@ namespace skwas.IO
 		~ChunkWriter()
 		{
 			Dispose(false);
-			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>

@@ -42,7 +42,6 @@ namespace skwas.IO
 		~ChunkReader()
 		{
 			Dispose(false);
-			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>
