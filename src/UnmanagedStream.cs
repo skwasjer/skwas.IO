@@ -132,14 +132,14 @@ namespace skwas.IO
 			if (_disposed)
 				throw new ObjectDisposedException(GetType().Name);
 
-			try
-			{
-				_stream.Commit((int)NativeMethods.STGC.Default);
-			}
-			catch (COMException ex)
-			{
-				throw new IOException(Resources.UnmanagedStream.IOException_StreamCantFlush, ex);
-			}
+			//try
+			//{
+			//	_stream.Commit((int)NativeMethods.STGC.Default);
+			//}
+			//catch (COMException ex)
+			//{
+			//	throw new IOException(Resources.UnmanagedStream.IOException_StreamCantFlush, ex);
+			//}
 		}
 
 
