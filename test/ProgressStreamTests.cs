@@ -26,6 +26,7 @@ namespace skwas.IO.Tests
 			{
 				CallbackCount++;
 				LastPercentage = value.Percentage;
+				Debug.WriteLine(LastPercentage);
 			}
 
 			#endregion
@@ -33,8 +34,8 @@ namespace skwas.IO.Tests
 
 		private static byte[] CreateStreamMock(out Mock<Stream> mockStream)
 		{
-			var buffer = new byte[10];
-			var streamSize = 1000000;
+			var buffer = new byte[4096];
+			var streamSize = 100000000;
 			var pos = 0;
 			mockStream = new Mock<Stream>();
 			mockStream.Setup(s => s.Length).Returns(() => streamSize).Verifiable();
@@ -61,6 +62,7 @@ namespace skwas.IO.Tests
 			{
 				callbackCount++;
 				lastPercentage = progress.Percentage;
+				Debug.WriteLine(lastPercentage);
 			};
 
 			Mock<Stream> mockStream;
