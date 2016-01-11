@@ -17,7 +17,7 @@ namespace skwas.IO
 	public sealed class UnmanagedStream : Stream
 	{
 		private bool _disposed;
-		private readonly bool _releaseOnDispose;
+		private readonly bool _leaveOpen;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly IStream _stream;
@@ -32,9 +32,9 @@ namespace skwas.IO
 		/// Initializes a new instance of <see cref="UnmanagedStream"/> using the specified <see cref="IStream"/>. 
 		/// </summary>
 		/// <param name="stream">The <see cref="IStream"/> to encapsulate.</param>
-		/// <param name="releaseOnDispose">When true, <see cref="Marshal.ReleaseComObject"/> will be called on the stream.</param>
+		/// <param name="leaveOpen">When true, <see cref="Marshal.ReleaseComObject"/> will be called on the stream.</param>
 		[SecuritySafeCritical]
-		public UnmanagedStream(IStream stream, bool releaseOnDispose = true)
+		public UnmanagedStream(IStream stream, bool leaveOpen = false)
 		{
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
@@ -73,7 +73,7 @@ namespace skwas.IO
 			}
 
 			_stream = stream;
-			_releaseOnDispose = releaseOnDispose;
+			_leaveOpen = leaveOpen;
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace skwas.IO
 				// Release managed.
 				Flush();
 
-				if (_stream != null && Marshal.IsComObject(_stream) && _releaseOnDispose) Marshal.ReleaseComObject(_stream);
+				if (_stream != null && Marshal.IsComObject(_stream) && !_leaveOpen) Marshal.ReleaseComObject(_stream);
 			}
 
 			// Release unmanaged.			

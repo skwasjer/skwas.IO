@@ -131,24 +131,7 @@ namespace skwas.IO.Tests
 		}
 
 		[TestMethod]
-		public void on_dispose_leaves_stream_open()
-		{
-			// Create stream and put some data in it.
-			var stream = SHCreateMemStream();
-			using (var ms = new UnmanagedStream(stream, false))
-				ms.Write(new byte[] { 0, 1, 2, 3 }, 0, 4);
-
-			// Test if IStream is not released by reading using its methods.
-			stream.Seek(0, 0, IntPtr.Zero);
-
-			// Manual release and test again.
-			Marshal.ReleaseComObject(stream);
-			Action action = () => stream.Seek(0, 0, IntPtr.Zero);
-			action.ShouldThrow<InvalidComObjectException>();
-		}
-
-		[TestMethod]
-		public void on_dispose_releases_stream()
+		public void when_created_with_auto_close_dispose_releases_stream()
 		{
 			// Create stream and put some data in it.
 			var stream = SHCreateMemStream();
@@ -156,6 +139,23 @@ namespace skwas.IO.Tests
 				ms.Write(new byte[] { 0, 1, 2, 3 }, 0, 4);
 
 			// Test if IStream is released by reading using its methods.
+			Action action = () => stream.Seek(0, 0, IntPtr.Zero);
+			action.ShouldThrow<InvalidComObjectException>();
+		}
+
+		[TestMethod]
+		public void when_created_with_leave_open_dispose_does_not_release_stream()
+		{
+			// Create stream and put some data in it.
+			var stream = SHCreateMemStream();
+			using (var ms = new UnmanagedStream(stream, true))
+				ms.Write(new byte[] { 0, 1, 2, 3 }, 0, 4);
+
+			// Test if IStream is not released by reading using its methods.
+			stream.Seek(0, 0, IntPtr.Zero);
+
+			// Manual release and test again.
+			Marshal.ReleaseComObject(stream);
 			Action action = () => stream.Seek(0, 0, IntPtr.Zero);
 			action.ShouldThrow<InvalidComObjectException>();
 		}
