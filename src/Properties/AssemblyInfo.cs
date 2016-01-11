@@ -2,7 +2,11 @@
 using System.Runtime.InteropServices;
 using System.Security;
 
+#if COVERAGE
+[assembly: SecurityRules(SecurityRuleSet.Level1)] 
+#else
 [assembly: AllowPartiallyTrustedCallers]
+#endif
 [assembly: System.CLSCompliant(true)]
 
 // General Information about an assembly is controlled through the following 

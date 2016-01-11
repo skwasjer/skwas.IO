@@ -64,6 +64,16 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>..\bin\Release\skwas.IO.XML</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug - Coverage|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug - Coverage\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;COVERAGE</DefineConstants>
+    <DocumentationFile>..\bin\Debug\skwas.IO.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
