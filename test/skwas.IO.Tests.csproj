@@ -71,6 +71,7 @@
     <Compile Include="FluentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionStreamTests.cs" />
+    <Compile Include="ProgressStreamTests.cs" />
     <Compile Include="UnmanagedStreamTests.cs" />
   </ItemGroup>
   <ItemGroup>

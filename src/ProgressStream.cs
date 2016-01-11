@@ -150,6 +150,9 @@ namespace skwas.IO
 					NotifyProgress();
 					await Task.Delay(Delay);
 				}
+
+				// Perform a last notification.
+				NotifyProgress();
 			}, _cancellationTokenSource.Token);
 		}
 
