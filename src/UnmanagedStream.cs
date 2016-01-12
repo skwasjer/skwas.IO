@@ -339,6 +339,8 @@ namespace skwas.IO
 		[SecuritySafeCritical]
 		private static NativeMethods.Stgm GetAccessMode(IStream stream)
 		{
+			Debug.Assert(stream != null, "Expected stream.");
+
 			try
 			{
 				// If IStream is created via CreateStreamOnHGlobal, stream.Stat() does not return the proper read/write state of the stream.
