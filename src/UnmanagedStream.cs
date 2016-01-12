@@ -33,6 +33,8 @@ namespace skwas.IO
 		/// </summary>
 		/// <param name="stream">The <see cref="IStream"/> to encapsulate.</param>
 		/// <param name="leaveOpen">When true, <see cref="Marshal.ReleaseComObject"/> will be called on the stream.</param>
+		/// <exception cref="IOException">Thrown when specified stream is not a valid <see cref="IStream"/>.</exception>
+		/// <exception cref="OutOfMemoryException">Thrown there is insufficient memory to read/write to/from the stream.</exception>
 		[SecuritySafeCritical]
 		public UnmanagedStream(IStream stream, bool leaveOpen = false)
 		{
@@ -131,21 +133,13 @@ namespace skwas.IO
 		{
 			if (_disposed)
 				throw new ObjectDisposedException(GetType().Name);
-
-			//try
-			//{
-			//	_stream.Commit((int)NativeMethods.STGC.Default);
-			//}
-			//catch (COMException ex)
-			//{
-			//	throw new IOException(Resources.UnmanagedStream.IOException_StreamCantFlush, ex);
-			//}
 		}
 
 
 		/// <summary>
 		/// Gets the length in bytes of the stream.
 		/// </summary>
+		/// <exception cref="InvalidOperationException">Thrown when underlying <see cref="IStream"/> has been released.</exception>
 		public override long Length
 		{
 			get
@@ -156,12 +150,16 @@ namespace skwas.IO
 				try
 				{
 					ComTypes.STATSTG stat;
-					_stream.Stat(out stat, (int)NativeMethods.STATFLAG.NoName);
+					_stream.Stat(out stat, (int) NativeMethods.STATFLAG.NoName);
 					return stat.cbSize;
 				}
-				catch (Exception ex)
+				catch (COMException ex)
 				{
-					throw new InvalidOperationException(Resources.UnmanagedStream.IOException_StreamGetLength, ex);
+					throw new IOException(Resources.UnmanagedStream.IOException_StreamGetLength, ex);
+				}
+				catch (InvalidComObjectException ex)
+				{
+					throw new InvalidOperationException(Resources.UnmanagedStream.InvalidOperationException_StreamReleased, ex);
 				}
 			}
 		}
@@ -193,22 +191,9 @@ namespace skwas.IO
 		[SecuritySafeCritical]
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			if (_disposed)
-				throw new ObjectDisposedException(GetType().Name);
-			if (buffer == null)
-				throw new ArgumentNullException(nameof(buffer));
-			if (offset + count > buffer.Length)
-				throw new ArgumentException();
-			if (offset < 0)
-				throw new ArgumentOutOfRangeException(nameof(offset));
-			if (count < 0)
-				throw new ArgumentOutOfRangeException(nameof(count));
+			CheckArguments(buffer, offset, count);
 			if (!CanRead)
 				throw new NotSupportedException(Resources.UnmanagedStream.Argument_StreamNotReadable);
-
-			// We are at end of stream?
-			if (Position >= Length)
-				return 0;
 
 			int bytesRead;
 			try
@@ -226,9 +211,13 @@ namespace skwas.IO
 					Buffer.BlockCopy(b, 0, buffer, offset, bytesRead);
 				}
 			}
-			catch (Exception ex)
+			catch (COMException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamRead, ex);
+			}
+			catch (InvalidComObjectException ex)
+			{
+				throw new InvalidOperationException(Resources.UnmanagedStream.InvalidOperationException_StreamReleased, ex);
 			}
 			return bytesRead;
 		}
@@ -252,9 +241,13 @@ namespace skwas.IO
 			{
 				_stream.Seek(offset, (int)origin, _hPosition);
 			}
-			catch (Exception ex)
+			catch (COMException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamSeek, ex);
+			}
+			catch (InvalidComObjectException ex)
+			{
+				throw new InvalidOperationException(Resources.UnmanagedStream.InvalidOperationException_StreamReleased, ex);
 			}
 			return Marshal.ReadInt64(_hPosition);
 		}
@@ -278,9 +271,13 @@ namespace skwas.IO
 			{
 				_stream.SetSize(value);
 			}
-			catch (Exception ex)
+			catch (COMException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamSetLength, ex);
+			}
+			catch (InvalidComObjectException ex)
+			{
+				throw new InvalidOperationException(Resources.UnmanagedStream.InvalidOperationException_StreamReleased, ex);
 			}
 		}
 
@@ -294,16 +291,7 @@ namespace skwas.IO
 		[SecuritySafeCritical]
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			if (_disposed)
-				throw new ObjectDisposedException(GetType().Name);
-			if (buffer == null)
-				throw new ArgumentNullException(nameof(buffer));
-			if (offset + count > buffer.Length)
-				throw new ArgumentException();
-			if (offset < 0)
-				throw new ArgumentOutOfRangeException(nameof(offset));
-			if (count < 0)
-				throw new ArgumentOutOfRangeException(nameof(count));
+			CheckArguments(buffer, offset, count);
 			if (!CanWrite)
 				throw new NotSupportedException(Resources.UnmanagedStream.Argument_StreamNotWriteable);
 
@@ -322,15 +310,31 @@ namespace skwas.IO
 					_stream.Write(b, count, IntPtr.Zero);
 				}
 			}
-			catch (Exception ex)
+			catch (COMException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamWrite, ex);
+			}
+			catch (InvalidComObjectException ex)
+			{
+				throw new InvalidOperationException(Resources.UnmanagedStream.InvalidOperationException_StreamReleased, ex);
 			}
 		}
 
 		#endregion
 
 		#region Helpers
+
+		private void CheckArguments(byte[] buffer, int offset, int count)
+		{
+			if (_disposed)
+				throw new ObjectDisposedException(GetType().Name);
+			if (buffer == null)
+				throw new ArgumentNullException(nameof(buffer));
+			if (offset < 0)
+				throw new ArgumentOutOfRangeException(nameof(offset));
+			if (count < 0 || offset + count > buffer.Length)
+				throw new ArgumentOutOfRangeException(nameof(count));
+		}
 
 		[SecuritySafeCritical]
 		private static NativeMethods.Stgm GetAccessMode(IStream stream)
@@ -348,7 +352,7 @@ namespace skwas.IO
 				stream.Stat(out stat, (int)NativeMethods.STATFLAG.NoName);
 				return (NativeMethods.Stgm)stat.grfMode;
 			}
-			catch (Exception ex)
+			catch (InvalidComObjectException ex)
 			{
 				throw new IOException(Resources.UnmanagedStream.IOException_StreamNotInitialized, ex);
 			}

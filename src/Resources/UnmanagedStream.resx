@@ -126,6 +126,9 @@
   <data name="Argument_StreamNotWriteable" xml:space="preserve">
     <value>Stream does not support writing.</value>
   </data>
+  <data name="InvalidOperationException_StreamReleased" xml:space="preserve">
+    <value>The underlying stream has been released.</value>
+  </data>
   <data name="IOException_StreamCantFlush" xml:space="preserve">
     <value>Stream can't be flushed.</value>
   </data>
@@ -133,7 +136,7 @@
     <value>Unable to get length of stream.</value>
   </data>
   <data name="IOException_StreamNotInitialized" xml:space="preserve">
-    <value>Stream can't be initialized.</value>
+    <value>Stream is not initialized or has been released.</value>
   </data>
   <data name="IOException_StreamRead" xml:space="preserve">
     <value>Unable to read from stream.</value>

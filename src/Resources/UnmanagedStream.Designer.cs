@@ -88,6 +88,15 @@ namespace skwas.IO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The underlying stream has been released..
+        /// </summary>
+        internal static string InvalidOperationException_StreamReleased {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_StreamReleased", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stream can&apos;t be flushed..
         /// </summary>
         internal static string IOException_StreamCantFlush {
@@ -106,7 +115,7 @@ namespace skwas.IO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Stream can&apos;t be initialized..
+        ///   Looks up a localized string similar to Stream is not initialized or has been released..
         /// </summary>
         internal static string IOException_StreamNotInitialized {
             get {
